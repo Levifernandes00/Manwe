@@ -16,5 +16,4 @@ server.use(express.urlencoded({ extended: true }));
 server.use(morgan("dev"));
 
 server.use(require('./routes'));
-
 server.listen(3333);
