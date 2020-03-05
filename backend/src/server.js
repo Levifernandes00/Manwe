@@ -5,14 +5,14 @@ const cors = require('cors');
 
 const server = express();
 
-mongoose.connect('', {
+mongoose.connect('mongodb+srv://admin:admin@manwe-dltvw.mongodb.net/test?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
 
 server.use(cors());
 server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
+server.use(express.urlencoded({ extended: false }));
 server.use(morgan("dev"));
 
 server.use(require('./routes'));

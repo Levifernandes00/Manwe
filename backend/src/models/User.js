@@ -24,10 +24,10 @@ const UserSchema = new Schema({
 })
 
 // middleware
-UserSchema.pre('save', async next => {
+UserSchema.pre('save', async function(next) {
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
-
+  
   next();
 })
 

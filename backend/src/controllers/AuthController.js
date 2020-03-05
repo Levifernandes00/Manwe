@@ -4,20 +4,30 @@ const jwt = require('jsonwebtoken');
 
 const authConfig = require('../config/auth');
 
+function generateToken(params = {}) {
+  return jwt.sign(params, authConfig.secret, {
+    expiresIn: 86400,
+  });
+}
+
 module.exports = {
   async register(req, res) {
     const { email } = req.body;
 
     try {
+
       if (await User.findOne({ email })){
         return res.status(400).json({ error: 'User already exists' });
       }
 
       const user = await User.create(req.body);
 
-      // user.password = undefined;
+      user.password = undefined;
 
-      return res.json(user);
+      return res.json({ 
+        user,
+        token: generateToken({ id: user.id }), 
+      });
     } catch(err) {
       return res.status(400).json({ error: 'Registration failed' });
     }
@@ -36,8 +46,12 @@ module.exports = {
       return res.status(400).json({ error: 'Invalid password' });
     }
 
+    user.password = undefined; 
 
-    return res.json(user);
+    return res.json({ 
+      user, 
+      token: generateToken({ id: user.id }), 
+    });
   }
 
 }
