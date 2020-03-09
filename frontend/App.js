@@ -105,6 +105,7 @@ export default function App() {
     if(isLoading) return (<Stack.Screen name="Splash" component={Splash} />);
     if(!userToken){
       return(
+        <> 
         <Stack.Screen
           name="SignIn"
           component={Login}
@@ -115,7 +116,16 @@ export default function App() {
             animationTypeForReplace: state.isSignout ? 'pop' : 'push',
           }}
         />
-        
+        <Stack.Screen
+          name="SignUp"
+          component={Register}
+          options={{
+            title: 'Sign up',
+            headerShown: false,
+          }}
+        />
+
+      </>  
       );
     }
     else {

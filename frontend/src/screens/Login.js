@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import { View, Text, StyleSheet, StatusBar, Image, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
-import Register from './Register';
 
 import CustomField from '../components/CustomField';
 import CustomButton from '../components/CustomButton';
@@ -10,7 +9,7 @@ const SignUp = ({ navigation }) => {
 
   return(
     <TouchableOpacity 
-      onPress={() => navigation.navigate('Register')}
+      onPress={() => navigation.navigate('SignUp')}
       style={styles.signUpButton}
     >
       <Text style={{ color: '#fff' }}>
