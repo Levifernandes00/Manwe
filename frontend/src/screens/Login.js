@@ -7,13 +7,14 @@ import {
   StatusBar,
   Image,
   KeyboardAvoidingView,
-  TouchableOpacity
+  TouchableOpacity,
+  AsyncStorage
 } from "react-native";
 
 import CustomField from "../components/CustomField";
 import CustomButton from "../components/CustomButton";
 
-import { signIn } from "../services/authApi";
+import api from "../services/api";
 
 const SignUp = ({ navigation }) => {
   return (
@@ -30,6 +31,23 @@ const SignUp = ({ navigation }) => {
 export default function screens({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const signIn = async givenData => {
+    try {
+      const { data } = await api.post("/auth/login", givenData);
+
+      const { user, token } = data;
+
+      await AsyncStorage.setItem("user", user._id);
+      await AsyncStorage.setItem("userToken", token);
+
+      navigation.navigate("App");
+    } catch (e) {
+      console.log(e);
+      const { data } = e.response;
+      alert(JSON.stringify(data));
+    }
+  };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -48,7 +66,6 @@ export default function screens({ navigation }) {
       <CustomButton
         onPress={() => {
           signIn({ email, password });
-          navigation.navigate("App");
         }}
       >
         Sign In

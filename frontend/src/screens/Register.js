@@ -7,7 +7,8 @@ import {
   StatusBar,
   Image,
   KeyboardAvoidingView,
-  TouchableOpacity
+  TouchableOpacity,
+  AsyncStorage
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -15,12 +16,12 @@ import CustomField from "../components/CustomField";
 import CustomButton from "../components/CustomButton";
 import NeomorphicButton from "../components/NeomorphicButton";
 
-import { signUp } from "../services/authApi";
+import api from "../services/api";
 
 const SignIn = ({ navigation }) => {
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate("SignIn")}
+      onPress={() => navigation.goBack()}
       style={styles.signUpButton}
     >
       <Text style={{ color: "#fff" }}>Don't have an account yet?</Text>
@@ -56,6 +57,22 @@ export default function Register({ navigation }) {
     StatusBar.setHidden(true);
   }, []);
 
+  const signUp = async givenData => {
+    try {
+      const { data } = await api.post("/auth/register", givenData);
+
+      const { user, token } = data;
+
+      await AsyncStorage.setItem("user", user._id);
+      await AsyncStorage.setItem("userToken", token);
+
+      navigation.navigate("App");
+    } catch (e) {
+      const { data } = e.response;
+      alert(JSON.stringify(data));
+    }
+  };
+
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <NeomorphicButton height={100} width={100}>
@@ -81,7 +98,6 @@ export default function Register({ navigation }) {
       <CustomButton
         onPress={() => {
           signUp({ name, imageURL, email, password });
-          navigation.navigate("App");
         }}
       >
         Sign Up
