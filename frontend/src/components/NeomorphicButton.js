@@ -5,14 +5,14 @@ import { BoxShadow } from 'react-native-shadow';
 
 export default class components extends Component {
   render() {
-    const { radius, onPress } = this.props;
+    const { onPress, width, height } = this.props;
 
     const morphTop = {
-      width:100,
-      height:100,
+      width,
+      height,
       color:"#222222",
       border:2,
-      radius:radius,
+      radius: 25,
       opacity:0.2,
       x:4,
       y:6,
@@ -20,11 +20,11 @@ export default class components extends Component {
     };
 
     const morphBottom = {
-      width:100,
-      height:100,
+      width,
+      height,
       color:"#404040",
       border:2,
-      radius:radius,
+      radius: 25,
       opacity:0.2,
       x:-4,
       y:-4,

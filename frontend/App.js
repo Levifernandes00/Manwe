@@ -4,7 +4,7 @@ import { AsyncStorage } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-const AuthContext = React.createContext();
+export const AuthContext = React.createContext();
 const Stack = createStackNavigator();
 
 import Splash from './src/screens/Splash';
@@ -14,6 +14,7 @@ import Home from './src/screens/Home';
 import NewEvent from './src/screens/NewEvent';
 import Profile from './src/screens/Profile';
 
+import api from './src/services/api';
 
 
 
@@ -74,35 +75,51 @@ export default function App() {
 
   const authContext = React.useMemo(
     () => ({
-      signIn: async data => {
-        // In a production app, we need to send some data (usually username, password) to server and get a token
-        // We will also need to handle errors if sign in failed
-        // After getting token, we need to persist the token using `AsyncStorage`
-        // In the example, we'll use a dummy token
+      signIn: async givenData => {
+        
+        
+        try {
+          const response = await api.post('/auth/login', givenData);
+          console.log(response);
+          const { user, token } = response.data;
 
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+          await AsyncStorage.setItem('userToken', token);
+          await AsyncStorage.setItem('user', user);
+
+          dispatch({ type: 'SIGN_IN', token });
+
+        } catch(err){
+          const { error } = err.response.data;
+          alert(error);
+        }
       },
-      signOut: () => dispatch({ type: 'SIGN_OUT' }),
-      signUp: async data => {
-        // In a production app, we need to send user data to server and get a token
-        // We will also need to handle errors if sign up failed
-        // After getting token, we need to persist the token using `AsyncStorage`
-        try{
-          await AsyncStorage.setItem("userToken", 'dummy-auth-token')
-        }
-        catch(e) {
-          alert('Error occured during Sign Up')
-        }
-        // In the example, we'll use a dummy token
+      signOut: async() => {
+        await AsyncStorage.clear();
+        dispatch({ type: 'SIGN_OUT' })
+      },
+      signUp: async givenData => {
+        try {
 
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+          const response = await api.post('/auth/register', givenData);
+          console.log(response);
+          const { user, token } = response.data;
+
+          await AsyncStorage.setItem('userToken', token);
+          await AsyncStorage.setItem('user', user);
+
+          dispatch({ type: 'SIGN_IN', token });
+
+        } catch(err){
+          const { error } = err.response.data;
+          alert(error);
+        }
       },
     }),
     []
   );
 
   const renderComponents = ({ isLoading, userToken }) => {
-    if(isLoading) return (<Stack.Screen name="Splash" component={Splash} />);
+    if(isLoading) return (<Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />);
     if(!userToken){
       return(
         <> 
@@ -124,12 +141,19 @@ export default function App() {
             headerShown: false,
           }}
         />
-
       </>  
       );
     }
     else {
-      return(<Stack.Screen name="Home" component={Home} />);
+      return(
+        <> 
+          <Stack.Screen 
+            name="Profile" 
+            component={Profile}
+            options={{ headerShown: false }}  
+          />
+        </>
+      );
     }
   }
 
@@ -143,4 +167,3 @@ export default function App() {
     </AuthContext.Provider>
   );
 }
-

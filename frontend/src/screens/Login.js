@@ -1,9 +1,12 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { View, Text, StyleSheet, StatusBar, Image, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 
 import CustomField from '../components/CustomField';
 import CustomButton from '../components/CustomButton';
+
+import { AuthContext } from '../../App';
+
 
 const SignUp = ({ navigation }) => {
 
@@ -20,37 +23,31 @@ const SignUp = ({ navigation }) => {
   );
 }
 
-export default class pages extends Component {
-  state={
-    email: "",
-    password: "",
-  }
+
+
+export default function screens({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { signIn } = React.useContext(AuthContext);
   
-  constructor(){
-    super();
-    StatusBar.setHidden(true);
-  }
-  
-  render() {
-    const { email, password } = this.state;
-    const { navigation } = this.props;
 
-    return (
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={styles.container}
-      >
-        <Image source={require('../../assets/logo.png')} style={styles.logo}  />
-        <CustomField title="Email" value={email} onChangeText={email => this.setState({ email })}/>
-        <CustomField title="Password" value={password} onChangeText={password => this.setState({ password })}/>
 
-        <CustomButton onPress={() => console.log('funfa')}>Sign In</CustomButton>
+  return (
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={styles.container}
+    >
+      <Image source={require('../../assets/logo.png')} style={styles.logo}  />
+      <CustomField title="Email" value={email} onChangeText={email => setEmail(email)}/>
+      <CustomField title="Password" value={password} onChangeText={password => setPassword(password)}/>
 
-        <SignUp navigation={navigation} />
-      </KeyboardAvoidingView>
-    );
-  }
+      <CustomButton onPress={() => signIn({ email, password })}>Sign In</CustomButton>
+
+      <SignUp navigation={navigation} />
+    </KeyboardAvoidingView>
+  );
 }
+
 
 const styles = StyleSheet.create({
   container: {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { View, Text, StyleSheet, StatusBar, Image, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +7,10 @@ import CustomField from '../components/CustomField';
 import CustomButton from '../components/CustomButton';
 import NeomorphicButton from '../components/NeomorphicButton';
 
-const SignUp = ({ navigation }) => {
+import { AuthContext } from '../../App';
+
+
+const SignIn = ({ navigation }) => {
 
   return(
     <TouchableOpacity 
@@ -22,66 +25,68 @@ const SignUp = ({ navigation }) => {
   );
 }
 
-export default class pages extends Component {
-  state={
-    imageURL: "",
-    email: "",
-    password: "",
-  }
-  
-  constructor(){
-    super();
-    StatusBar.setHidden(true);
-  }
 
-  renderImage = (radius) => {
-    const { imageURL } = this.state;
 
-    if(imageURL) {
-      return(
-        <Image source={require('../../assets/logo.png')} style={[styles.logo, { borderRadius: radius }]}  />
-      );  
-    }
-    else {
-      return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Ionicons name="ios-add" size={30} color="#fff"/>
-        </View>
-      );
-    }
+const RenderImage = ({ borderRadius, imageURL }) => {
+
+  if(imageURL) {
+    return(
+      <Image source={require('../../assets/logo.png')} style={[styles.logo, { borderRadius }]}  />
+    );  
   }
-  
-  render() {
-    const { email, password } = this.state;
-    const { navigation } = this.props;
-
+  else {
     return (
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={styles.container}
-      >
-        <NeomorphicButton radius={25}>
-          {this.renderImage(25)}
-        </NeomorphicButton>
-        
-        <CustomField 
-          title="Email" 
-          value={email} 
-          onChangeText={email => this.setState({ email })}
-        />
-        <CustomField 
-          title="Password" 
-          value={password} 
-          onChangeText={password => this.setState({ password })}
-        />
-
-        <CustomButton onPress={() => console.log('funfa')}>Sign Up</CustomButton>
-
-        <SignUp navigation={navigation} />
-      </KeyboardAvoidingView>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Ionicons name="ios-add" size={30} color="#fff"/>
+      </View>
     );
   }
 }
+
+export default function Register({ navigation }) {
+  const [ imageURL, setImageURL ] = useState('');
+  const [ email, setEmail ] = useState('');
+  const [ name, setName ] = useState('');
+  const [ password, setPassword ] = useState('');
+
+  const { signUp } = React.useContext(AuthContext);
+
+  useEffect(()=>{
+    StatusBar.setHidden(true);
+  },[])
+
+  return (
+    <KeyboardAvoidingView
+      behavior="padding"
+      style={styles.container}
+    >
+      <NeomorphicButton height={100} width={100}>
+        <RenderImage borderRadius={25} imageURL={imageURL}/>
+      </NeomorphicButton>
+      
+      <CustomField 
+        title="Name" 
+        value={name} 
+        onChangeText={name => setName(name)}
+      />
+      <CustomField 
+        title="Email" 
+        value={email} 
+        onChangeText={email => setEmail(email)}
+      />
+      <CustomField 
+        title="Password" 
+        value={password} 
+        onChangeText={password => setPassword(password)}
+      />
+
+      <CustomButton onPress={() => signUp({ name, imageURL, email, password })}>Sign Up</CustomButton>
+
+      <SignIn navigation={navigation} />
+    </KeyboardAvoidingView>
+  );
+}
+
 
 const styles = StyleSheet.create({
   container: {
