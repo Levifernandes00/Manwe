@@ -21,9 +21,9 @@ const authStack = createStackNavigator(
 
 const appStack = createStackNavigator(
   {
+    NewEvent,
     Home,
-    Profile,
-    NewEvent
+    Profile
   },
   {
     headerMode: "none"

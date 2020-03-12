@@ -5,7 +5,7 @@ import { BoxShadow } from "react-native-shadow";
 
 export default class components extends Component {
   render() {
-    const { onPress, width, height, style } = this.props;
+    const { width, height } = this.props;
 
     const morphTop = {
       width,
@@ -31,22 +31,10 @@ export default class components extends Component {
       style: { marginVertical: 5 }
     };
 
-    if (style) {
-      return (
-        <TouchableOpacity style={style} onPress={onPress}>
-          <BoxShadow setting={morphTop}>
-            <BoxShadow setting={morphBottom}>{this.props.children}</BoxShadow>
-          </BoxShadow>
-        </TouchableOpacity>
-      );
-    } else {
-      return (
-        <TouchableOpacity onPress={onPress}>
-          <BoxShadow setting={morphTop}>
-            <BoxShadow setting={morphBottom}>{this.props.children}</BoxShadow>
-          </BoxShadow>
-        </TouchableOpacity>
-      );
-    }
+    return (
+      <BoxShadow setting={morphTop}>
+        <BoxShadow setting={morphBottom}>{this.props.children}</BoxShadow>
+      </BoxShadow>
+    );
   }
 }
