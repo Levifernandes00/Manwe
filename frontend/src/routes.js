@@ -21,8 +21,8 @@ const authStack = createStackNavigator(
 
 const appStack = createStackNavigator(
   {
-    NewEvent,
     Home,
+    NewEvent,
     Profile
   },
   {
