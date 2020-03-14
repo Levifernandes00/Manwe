@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  AsyncStorage
+} from "react-native";
 
 import MapView, { Marker, Callout } from "react-native-maps";
 import * as Location from "expo-location";
@@ -9,6 +16,8 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 
 import NeomorphicButton from "../components/NeomorphicButton";
 import NeomorphicView from "../components/NeomorphicView";
+
+import api from "../services/api";
 
 const NewButton = ({ onPress, type }) => {
   if (type === "user") {
@@ -67,32 +76,35 @@ const CustomMarker = marker => {
 
 export default class pages extends Component {
   state = {
+    uid: "",
     region: {
       latitudeDelta: 0.015,
       longitudeDelta: 0.015
     },
-    markers: [
-      {
-        coordinate: { latitude: -23.55, longitude: -46.569336 },
-        imageURL:
-          "https://images.unsplash.com/photo-1584036224416-d6be110d7a80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-        title: "Coffee",
-        date: "20/08 5pm"
-      },
-      {
-        coordinate: { latitude: -23.559992, longitude: -46.569336 },
-        imageURL:
-          "https://images.unsplash.com/photo-1558981033-f5e2ddd9c57e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80",
-        title: "Motorcycle Event",
-        date: "20/08 5pm"
-      }
-    ]
+    markers: []
   };
 
   constructor() {
     super();
     this._getLocationAsync();
+    this._getEventsAsync();
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.markers !== this.state.markers) {
+      setTimeout(() => this._getEventsAsync(), 4000);
+    }
+  }
+
+  _getEventsAsync = async () => {
+    try {
+      const { data: markers } = await api.get("/events");
+      this.setState({ markers });
+    } catch (err) {
+      console.log(err);
+      alert(err.response);
+    }
+  };
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -350,7 +362,7 @@ export default class pages extends Component {
           customMapStyle={this.mapStyle}
         >
           {markers.map(marker => (
-            <CustomMarker {...marker} />
+            <CustomMarker key={marker._id} {...marker} />
           ))}
         </MapView>
         <View style={styles.buttonsContainer}>
@@ -359,7 +371,7 @@ export default class pages extends Component {
             type="user"
           />
           <NewButton
-            onPress={() => navigation.navigate("NewEvent")}
+            onPress={() => navigation.navigate("NewEvent", region)}
             type="event"
           />
         </View>

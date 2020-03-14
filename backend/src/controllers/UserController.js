@@ -14,5 +14,11 @@ module.exports = {
     await user.remove();
 
     return res.send({ ok: true });
+  },
+
+  async getUser(req, res) {
+    const user = await User.findById(req.headers.id);
+
+    return res.json(user);
   }
 };

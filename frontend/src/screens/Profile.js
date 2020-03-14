@@ -6,12 +6,15 @@ import {
   StyleSheet,
   StatusBar,
   TouchableOpacity,
-  AsyncStorage
+  AsyncStorage,
+  Image
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import NeomorphicButton from "../components/NeomorphicButton";
 import EventSection from "../components/EventSection";
+
+import api from "../services/api";
 
 const TopBar = ({ navigation }) => {
   const signOut = async () => {
@@ -39,7 +42,7 @@ const RenderImage = ({ radius, imageURL }) => {
   if (imageURL) {
     return (
       <Image
-        source={require("../../assets/logo.png")}
+        source={{ uri: `${imageURL}` }}
         style={[styles.logo, { borderRadius: radius }]}
       />
     );
@@ -59,7 +62,7 @@ const UserInformation = ({ user }) => {
         <RenderImage radius={25} imageURL={user.imageURL} />
       </NeomorphicButton>
 
-      <Text style={styles.name}>Name</Text>
+      <Text style={styles.name}>{user.name}</Text>
     </View>
   );
 };
@@ -70,7 +73,28 @@ export default function Profile({ navigation }) {
 
   useEffect(() => {
     StatusBar.setHidden(true);
+    _getUserAsync();
+    _getEventsAsync();
   }, []);
+
+  useEffect(() => {
+    _getEventsAsync();
+  }, [events]);
+
+  const _getUserAsync = async () => {
+    const id = await AsyncStorage.getItem("user");
+
+    const { data } = await api.get("/user", { headers: { id } });
+
+    setUser(data);
+  };
+  const _getEventsAsync = async () => {
+    const id = await AsyncStorage.getItem("user");
+
+    const { data } = await api.get("/events", { headers: { id } });
+
+    setEvents(data);
+  };
 
   return (
     <View style={styles.container}>
@@ -101,5 +125,9 @@ const styles = StyleSheet.create({
     color: "#F8A700",
     fontSize: 16,
     fontWeight: "bold"
+  },
+  logo: {
+    height: 80,
+    width: 80
   }
 });

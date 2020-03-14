@@ -32,7 +32,7 @@ const RenderImage = ({ borderRadius, imageURL }) => {
   if (imageURL) {
     return (
       <Image
-        source={require("../../assets/logo.png")}
+        source={{ uri: `${imageURL}` }}
         style={[styles.logo, { borderRadius }]}
       />
     );
@@ -46,19 +46,37 @@ const RenderImage = ({ borderRadius, imageURL }) => {
 };
 
 export default function Register({ navigation }) {
-  const [imageURL, setImageURL] = useState("");
+  const [imageURL, setImageURL] = useState(
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=709&q=80"
+  );
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
+  const [coordinate, setCoordinate] = useState({});
 
   useEffect(() => {
     StatusBar.setHidden(true);
+    getCoordinates();
   }, []);
+
+  const getCoordinates = () => {
+    const { latitude, longitude } = navigation.state.params;
+    setCoordinate({ latitude, longitude });
+  };
 
   const addEvent = async givenData => {
     try {
+      const id = await AsyncStorage.getItem("user");
+      console.log(id);
+
+      const response = await api.post(
+        "/events/add",
+        { imageURL, title, date, coordinate },
+        { headers: { id } }
+      );
+
+      console.log(response);
     } catch (e) {
-      const { data } = e.response;
-      alert(JSON.stringify(data));
+      console.log(e.response.data);
     }
   };
 

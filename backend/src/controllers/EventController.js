@@ -6,13 +6,20 @@ module.exports = {
     const { id: creator } = req.headers;
 
     if (!title || !date || !imageURL || !coordinate) {
-      return res.status(400).json({ error: "Information missing" });
+      let message = "";
+      if (!title) message = "missing title";
+      if (!date) message = "missing date";
+      if (!imageURL) message = "imageURL missing";
+      if (!coordinate) messsage = "coordinate missing";
+      return res.status(400).json({ error: { message } });
     }
+
     try {
       if (await Event.findOne({ title, date })) {
         return res.status(400).json({ error: "Event already exists" });
       }
 
+      console.log(req.body, creator);
       const event = await Event.create({
         title,
         date,
@@ -36,7 +43,14 @@ module.exports = {
     }
     return res.json(events);
   },
-  async updateEvent(req, res) {},
+  async updateCoordinate(req, res) {
+    const { coordinate } = req.body;
+    const { eventId } = req.params;
+
+    const event = await Event.updateOne({ _id: eventId }, { coordinate });
+
+    return res.json(event);
+  },
   async deleteEvent(req, res) {
     const { eventId } = req.params;
 

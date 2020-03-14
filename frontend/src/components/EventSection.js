@@ -1,44 +1,53 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { View, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
-import NeomorphicButton from './NeomorphicButton';
+import NeomorphicButton from "./NeomorphicButton";
+
+import api from "../services/api";
 
 const EventCard = ({ event }) => {
   const CloseButton = () => {
-    return(
-      <TouchableOpacity style={{ marginLeft: 'auto' }}>
+    const deleteEvent = async () => {
+      await api.delete(`/events/${event._id}`);
+    };
+
+    return (
+      <TouchableOpacity
+        onPress={() => deleteEvent()}
+        style={{ marginLeft: "auto" }}
+      >
         <AntDesign name="close" color="#fff" />
       </TouchableOpacity>
     );
-  }
+  };
 
-  return(
+  return (
     <NeomorphicButton width={120} height={149}>
-      <View style={{ flex: 1, padding: 10, }}>
-        <CloseButton/>
+      <View style={{ flex: 1, padding: 10 }}>
+        <CloseButton />
         <Image
-          style={styles.image} 
-          source={{ uri: 'https://images.unsplash.com/photo-1583841046282-570c1f88e8be?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=751&q=80' }} 
+          style={styles.image}
+          source={{
+            uri: `${event.imageURL}`
+          }}
         />
-        <Text style={styles.title}>Event</Text>
-        <Text style={styles.date}>Date 03/18 8pm</Text>
+        <Text style={styles.title}>{event.name}</Text>
+        <Text style={styles.date}>{event.date}</Text>
       </View>
     </NeomorphicButton>
   );
-}
+};
 
 export default class components extends Component {
   render() {
     const { events } = this.props;
 
-    return(
+    return (
       <View style={styles.container}>
-        <EventCard event={10} />
-        <EventCard event={10} />
-        <EventCard event={10} />
-        <EventCard event={10} />
+        {events &&
+          events.map(event => <EventCard key={event._id} event={event} />)}
       </View>
     );
   }
@@ -47,38 +56,37 @@ export default class components extends Component {
 const styles = StyleSheet.create({
   container: {
     marginTop: 10,
-    
+
     flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    
-    alignSelf: 'stretch',
-    justifyContent: 'space-around',
-    alignItems: 'baseline'
+    flexDirection: "row",
+    flexWrap: "wrap",
+
+    alignSelf: "stretch",
+    justifyContent: "space-around",
+    alignItems: "baseline"
   },
 
   image: {
     height: 60,
     width: 60,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginTop: 6,
-    borderRadius: 15,
+    borderRadius: 15
   },
 
   title: {
     fontSize: 15,
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginTop: 5,
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+    marginTop: 5
   },
 
   date: {
     fontSize: 10,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginTop: 8,
-    color: '#F8A700'
-  },
-
+    color: "#F8A700"
+  }
 });
