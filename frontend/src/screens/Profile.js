@@ -71,17 +71,10 @@ const UserInformation = ({ user }) => {
 
 export default function Profile({ navigation }) {
   const [user, setUser] = useState({});
-  const [events, setEvents] = useState([]);
-
   useEffect(() => {
     StatusBar.setHidden(true);
     _getUserAsync();
-    _getEventsAsync();
   }, []);
-
-  useEffect(() => {
-    _getEventsAsync();
-  }, [events]);
 
   const _getUserAsync = async () => {
     const id = await AsyncStorage.getItem("user");
@@ -90,19 +83,12 @@ export default function Profile({ navigation }) {
 
     setUser(data);
   };
-  const _getEventsAsync = async () => {
-    const id = await AsyncStorage.getItem("user");
-
-    const { data } = await api.get("/events", { headers: { id } });
-
-    setEvents(data);
-  };
 
   return (
     <View style={styles.container}>
       <TopBar navigation={navigation} />
       <UserInformation user={user} />
-      <EventSection events={events} />
+      <EventSection />
     </View>
   );
 }

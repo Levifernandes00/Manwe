@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 
-import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Text,
+  AsyncStorage
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 
 import NeomorphicButton from "./NeomorphicButton";
@@ -41,8 +48,34 @@ const EventCard = ({ event }) => {
 };
 
 export default class components extends Component {
+  _isMounted = false;
+  state = {
+    events: []
+  };
+
+  componentDidMount() {
+    this._getEventsAsync();
+    this._isMounted = true;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this._isMounted && prevState.events !== this.state.events) {
+      this._getEventsAsync();
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+  _getEventsAsync = async () => {
+    const id = await AsyncStorage.getItem("user");
+
+    const { data: events } = await api.get("/events", { headers: { id } });
+
+    this.setState({ events });
+  };
   render() {
-    const { events } = this.props;
+    const { events } = this.state;
 
     return (
       <View style={styles.container}>
