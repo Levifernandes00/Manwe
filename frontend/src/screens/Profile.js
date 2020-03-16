@@ -14,7 +14,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import NeomorphicButton from "../components/NeomorphicButton";
 import EventSection from "../components/EventSection";
 
-import api from "../services/api";
+import api, { BASE_URL } from "../services/api";
 
 const TopBar = ({ navigation }) => {
   const signOut = async () => {

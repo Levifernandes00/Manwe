@@ -17,7 +17,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import NeomorphicButton from "../components/NeomorphicButton";
 import NeomorphicView from "../components/NeomorphicView";
 
-import api from "../services/api";
+import api, { BASE_URL } from "../services/api";
 
 const NewButton = ({ onPress, type }) => {
   if (type === "user") {
@@ -108,6 +108,11 @@ export default class pages extends Component {
   _getEventsAsync = async () => {
     try {
       const { data: markers } = await api.get("/events");
+      markers.forEach(marker => {
+        const url = `${BASE_URL}${marker.imageURL}`;
+        marker.imageURL = url;
+        console.log(marker.imageURL);
+      });
       this.setState({ ...this.state, markers });
     } catch (err) {
       console.log(err);

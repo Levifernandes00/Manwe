@@ -5,7 +5,7 @@ import { AntDesign } from "@expo/vector-icons";
 
 import NeomorphicButton from "./NeomorphicButton";
 
-import api from "../services/api";
+import api, { BASE_URL } from "../services/api";
 
 const EventCard = ({ event }) => {
   const CloseButton = () => {
@@ -30,7 +30,7 @@ const EventCard = ({ event }) => {
         <Image
           style={styles.image}
           source={{
-            uri: `${event.imageURL}`
+            uri: `${BASE_URL}${event.imageURL}`
           }}
         />
         <Text style={styles.title}>{event.name}</Text>

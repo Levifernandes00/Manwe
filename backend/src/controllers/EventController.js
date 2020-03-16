@@ -2,7 +2,8 @@ const Event = require("../models/Event");
 
 module.exports = {
   async store(req, res) {
-    const { title, date, imageURL, coordinate } = req.body;
+    const { title, date, coordinate } = JSON.parse(req.body.information);
+    const { filename: imageURL } = req.file;
     const { id: creator } = req.headers;
 
     if (!title || !date || !imageURL || !coordinate) {
@@ -11,7 +12,7 @@ module.exports = {
       if (!date) message = "missing date";
       if (!imageURL) message = "imageURL missing";
       if (!coordinate) messsage = "coordinate missing";
-      return res.status(400).json({ error: { message } });
+      return res.status(400).json({ error: `${message}` });
     }
 
     try {
@@ -19,7 +20,6 @@ module.exports = {
         return res.status(400).json({ error: "Event already exists" });
       }
 
-      console.log(req.body, creator);
       const event = await Event.create({
         title,
         date,

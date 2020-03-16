@@ -27,4 +27,10 @@ const EventSchema = new Schema({
   }
 });
 
+EventSchema.pre("save", async function(next) {
+  const url = `/files/${this.imageURL}`;
+  this.imageURL = url;
+  next();
+});
+
 module.exports = model("Event", EventSchema);

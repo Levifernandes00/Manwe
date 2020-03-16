@@ -16,12 +16,17 @@ import CustomField from "../components/CustomField";
 import CustomButton from "../components/CustomButton";
 import NeomorphicButton from "../components/NeomorphicButton";
 
+import * as ImagePicker from "expo-image-picker";
+import * as Permissions from "expo-permissions";
+
 import api from "../services/api";
 
 const TopBar = ({ navigation }) => {
   return (
     <View style={styles.topBar}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Home", { update: true })}
+      >
         <Ionicons name="ios-arrow-back" color="#fff" size={20} />
       </TouchableOpacity>
     </View>
@@ -46,12 +51,11 @@ const RenderImage = ({ borderRadius, imageURL }) => {
 };
 
 export default function Register({ navigation }) {
-  const [imageURL, setImageURL] = useState(
-    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=709&q=80"
-  );
+  const [imageURL, setImageURL] = useState("");
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [coordinate, setCoordinate] = useState({});
+  const [data, setData] = useState(new FormData());
 
   useEffect(() => {
     StatusBar.setHidden(true);
@@ -66,18 +70,49 @@ export default function Register({ navigation }) {
   const addEvent = async givenData => {
     try {
       const id = await AsyncStorage.getItem("user");
-      console.log(id);
 
-      const response = await api.post(
-        "/events/add",
-        { imageURL, title, date, coordinate },
-        { headers: { id } }
+      let newData;
+      newData = data;
+      newData.append(
+        "information",
+        JSON.stringify({ title, date, coordinate })
       );
 
-      console.log(response);
+      const response = await api.post("/events/add", data, {
+        headers: {
+          id
+        }
+      });
+
+      console.log(response.data);
       navigation.navigate("Home", { update: true });
     } catch (e) {
-      console.log(e.response.data);
+      console.log(e);
+    }
+  };
+
+  selectPicture = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+    if (granted) {
+      const { cancelled, uri } = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        base64: true,
+        aspect: [1, 1]
+      });
+      if (!cancelled) {
+        setImageURL(uri);
+        const newData = new FormData();
+        let filename = uri.split("/").pop();
+
+        newData.append("file", {
+          uri,
+          type: "image/jpeg",
+          name: `${filename}`
+        });
+
+        setData(newData);
+      }
     }
   };
 
@@ -85,7 +120,11 @@ export default function Register({ navigation }) {
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <TopBar navigation={navigation} />
       <Text style={styles.title}>New Event</Text>
-      <NeomorphicButton height={100} width={100}>
+      <NeomorphicButton
+        onPress={() => selectPicture()}
+        height={100}
+        width={100}
+      >
         <RenderImage borderRadius={25} imageURL={imageURL} />
       </NeomorphicButton>
 
