@@ -75,6 +75,8 @@ const CustomMarker = marker => {
 };
 
 export default class pages extends Component {
+  _isMounted = false;
+
   state = {
     uid: "",
     region: {
@@ -84,22 +86,29 @@ export default class pages extends Component {
     markers: []
   };
 
-  constructor() {
-    super();
+  componentDidMount() {
     this._getLocationAsync();
     this._getEventsAsync();
+    this._isMounted = true;
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.markers !== this.state.markers) {
-      setTimeout(() => this._getEventsAsync(), 4000);
+    if (this._isMounted && prevProps.navigation !== this.props.navigation) {
+      const { update } = this.props.navigation.state.params;
+      if (update) {
+        this._getEventsAsync();
+      }
     }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   _getEventsAsync = async () => {
     try {
       const { data: markers } = await api.get("/events");
-      this.setState({ markers });
+      this.setState({ ...this.state, markers });
     } catch (err) {
       console.log(err);
       alert(err.response);
@@ -119,6 +128,10 @@ export default class pages extends Component {
 
     this.setState({ region: { ...this.state.region, longitude, latitude } });
   };
+
+  onRegionChange(region) {
+    this.setState({ region });
+  }
 
   mapStyle = [
     {
@@ -358,6 +371,8 @@ export default class pages extends Component {
       <View style={{ flex: 1 }}>
         <MapView
           region={region}
+          followsUserLocation={true}
+          showsUserLocation={true}
           style={{ flex: 1 }}
           customMapStyle={this.mapStyle}
         >

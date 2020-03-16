@@ -75,6 +75,7 @@ export default function Register({ navigation }) {
       );
 
       console.log(response);
+      navigation.navigate("Home", { update: true });
     } catch (e) {
       console.log(e.response.data);
     }

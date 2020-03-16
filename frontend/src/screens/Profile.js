@@ -24,7 +24,9 @@ const TopBar = ({ navigation }) => {
 
   return (
     <View style={styles.topBar}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Home", { update: true })}
+      >
         <Ionicons name="ios-arrow-back" color="#fff" size={20} />
       </TouchableOpacity>
 
